@@ -1,5 +1,9 @@
 package org.nipu.po.order.clients;
 
+import feign.hystrix.FallbackFactory;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,9 +14,31 @@ import org.springframework.web.bind.annotation.RequestMethod;
  *
  * @author Nikita_Puzankov
  */
-@FeignClient(name = "pc")
+@FeignClient(name = "pc", fallbackFactory = ProductSpecificationRepositoryFallbackFactory.class)
 public interface ProductSpecificationRepository {
 
     @RequestMapping(method = RequestMethod.GET, path = "/catalog/{specificationId}")
     Object existsById(@PathVariable("specificationId") String specificationId);
+}
+
+class ProductSpecificationRepositoryFallbackFactory implements FallbackFactory<ProductSpecificationRepository> {
+
+    @Override
+    public ProductSpecificationRepository create(Throwable throwable) {
+        return new ProductSpecificationRepositoryFallback(throwable);
+    }
+}
+
+@Slf4j
+@RequiredArgsConstructor
+class ProductSpecificationRepositoryFallback implements ProductSpecificationRepository {
+
+    private final Throwable exception;
+
+    @Override
+    public Object existsById(String specificationId) {
+        log.error("An exception has arisen during feign call", exception);
+        log.warn("Fallback method of ProductSpecificationRepository#existsById has been invoked");
+        return false;
+    }
 }
