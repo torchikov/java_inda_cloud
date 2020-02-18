@@ -1,0 +1,26 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: pc
+          predicates:
+            - Path=/pc/**
+          uri: lb://pc/
+        - id: po
+          predicates:
+            - Path=/po/**
+          uri: lb://po/
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
