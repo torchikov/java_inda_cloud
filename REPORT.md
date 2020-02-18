@@ -1,4 +1,4 @@
-During home task I've added Eurika as Service discovery, Spring CLoud API Gateway and Hystrix as circuit breaker. 
+During home task I've added Eureka as Service discovery, Spring CLoud API Gateway and Hystrix as circuit breaker. 
 
 Learned
 
